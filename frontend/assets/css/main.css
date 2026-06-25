@@ -1,0 +1,398 @@
+:root {
+  --page: #f7fbfd;
+  --paper: #ffffff;
+  --ink: #1d2b36;
+  --muted: #657888;
+  --line: #d8e7ee;
+  --primary: #0b5d82;
+  --primary-dark: #06445f;
+  --accent: #35a9cf;
+  --soft: #e7f6fb;
+  --warn: #fff7df;
+  --danger: #b42318;
+  --success: #177245;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Yu Gothic UI", Meiryo, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--page);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.page {
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.brand h1 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 21px;
+  letter-spacing: 0;
+}
+
+.brand p,
+.clinic-meta p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.clinic-meta {
+  text-align: right;
+}
+
+.main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+.notice-band {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--accent);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+.notice-band strong {
+  color: var(--primary-dark);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.panel,
+.card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.panel {
+  padding: 18px;
+}
+
+.section-title {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  color: var(--primary-dark);
+  font-size: 18px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #eef6fa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.tab {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  min-height: 40px;
+  font-weight: 700;
+}
+
+.tab.active {
+  background: var(--paper);
+  color: var(--primary-dark);
+  box-shadow: 0 1px 3px rgba(4, 68, 95, 0.12);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.field label {
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #c9dbe3;
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: white;
+  border-radius: 6px;
+  min-height: 42px;
+  padding: 9px 14px;
+  font-weight: 700;
+}
+
+.btn.secondary {
+  background: var(--paper);
+  color: var(--primary);
+}
+
+.btn.danger {
+  border-color: var(--danger);
+  background: var(--danger);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.message {
+  margin: 12px 0 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--soft);
+  color: var(--primary-dark);
+  font-size: 14px;
+}
+
+.message.error {
+  background: #fff0ee;
+  color: var(--danger);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.demo {
+  margin-top: 18px;
+  padding: 12px;
+  background: #fbfdfe;
+  border: 1px dashed #b8d3df;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 190px 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.slot {
+  padding: 14px;
+  text-align: left;
+}
+
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.mark.ok {
+  color: var(--success);
+  background: #e9f7ef;
+}
+
+.mark.full {
+  color: var(--danger);
+  background: #fff0ee;
+}
+
+.slot-time {
+  margin: 8px 0 4px;
+  color: var(--primary-dark);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.slot p {
+  margin: 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.appointment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.appointment {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.appointment h3 {
+  margin: 0 0 6px;
+  color: var(--primary-dark);
+  font-size: 16px;
+}
+
+.appointment p {
+  margin: 3px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.status {
+  display: inline-flex;
+  min-width: 80px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status.booked {
+  background: #e9f7ef;
+  color: var(--success);
+}
+
+.status.cancelled {
+  background: #f1f3f5;
+  color: var(--muted);
+}
+
+.staff-editor {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px dashed #b8d3df;
+  border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+  .topbar-inner,
+  .notice-band,
+  .appointment {
+    display: block;
+  }
+
+  .clinic-meta {
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar,
+  .staff-editor {
+    grid-template-columns: 1fr;
+  }
+}
