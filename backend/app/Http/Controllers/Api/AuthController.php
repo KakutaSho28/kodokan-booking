@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -19,14 +20,37 @@ class AuthController extends Controller
             'birth_date' => ['required', 'date_format:Y-m-d'],
         ]);
 
+        $attemptKey = 'patient-login-attempts:'.$credentials['card_number'];
+        $lockKey = 'patient-login-lock:'.$credentials['card_number'];
+
+        if (Cache::has($lockKey)) {
+            return response()->json([
+                'message' => 'ログイン試行回数が上限に達しました。15分後に再試行してください。',
+            ], 429);
+        }
+
         $patient = Patient::query()
             ->where('card_number', $credentials['card_number'])
             ->whereDate('birth_date', $credentials['birth_date'])
             ->first();
 
         if (! $patient) {
+            $attempts = Cache::increment($attemptKey);
+            Cache::put($attemptKey, $attempts, now()->addMinutes(15));
+
+            if ($attempts >= 5) {
+                Cache::put($lockKey, true, now()->addMinutes(15));
+
+                return response()->json([
+                    'message' => 'ログイン試行回数が上限に達しました。15分後に再試行してください。',
+                ], 429);
+            }
+
             return response()->json(['message' => '診察券番号または生年月日が一致しません。'], 401);
         }
+
+        Cache::forget($attemptKey);
+        Cache::forget($lockKey);
 
         return response()->json([
             'token' => AccessToken::issue('patient', $patient->id),

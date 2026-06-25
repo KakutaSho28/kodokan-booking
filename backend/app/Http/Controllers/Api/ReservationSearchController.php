@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationSearchRequest;
 use App\Models\Appointment;
+use App\Services\PatientDataMasker;
 use Illuminate\Http\JsonResponse;
 
 class ReservationSearchController extends Controller
@@ -44,8 +45,20 @@ class ReservationSearchController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $masker = app(PatientDataMasker::class);
+
         return response()->json([
-            'data' => $reservations->items(),
+            'data' => collect($reservations->items())
+                ->map(function (Appointment $appointment) use ($masker, $request): array {
+                    $data = $appointment->toArray();
+
+                    if ($appointment->patient && $masker->shouldMask($request)) {
+                        $data['patient'] = $masker->maskPatient($appointment->patient);
+                    }
+
+                    return $data;
+                })
+                ->all(),
             'meta' => [
                 'current_page' => $reservations->currentPage(),
                 'from' => $reservations->firstItem(),
