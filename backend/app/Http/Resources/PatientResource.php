@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\PatientDataMasker;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,12 +15,15 @@ class PatientResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $masker = app(PatientDataMasker::class);
+        $mask = $masker->shouldMask($request);
+
         return [
             'id' => $this->id,
-            'card_number' => $this->card_number,
-            'chart_number' => $this->card_number,
+            'card_number' => $mask ? $masker->maskChartNumber($this->card_number) : $this->card_number,
+            'chart_number' => $mask ? $masker->maskChartNumber($this->card_number) : $this->card_number,
             'name' => $this->name,
-            'birth_date' => $this->birth_date?->format('Y-m-d'),
+            'birth_date' => $mask ? '****年生まれ' : $this->birth_date?->format('Y-m-d'),
             'email' => $this->email,
             'is_first_visit' => (bool) $this->is_first_visit,
             'has_rehab_clearance' => (bool) $this->has_rehab_clearance,

@@ -8,6 +8,7 @@ use App\Models\AccessToken;
 use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\Staff;
+use App\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -57,6 +58,7 @@ class PatientController extends Controller
         $data['is_first_visit'] = ! $data['is_diagnosed'];
 
         $patient = Patient::query()->create($data);
+        app(AuditLogger::class)->log('patient.created', $patient);
 
         return response()->json([
             'message' => '患者を登録しました。',
@@ -97,6 +99,7 @@ class PatientController extends Controller
         unset($data['chart_number'], $data['is_diagnosed']);
 
         $patient->update($data);
+        app(AuditLogger::class)->log('patient.updated', $patient);
 
         return response()->json([
             'message' => '患者情報を更新しました。',
@@ -126,6 +129,7 @@ class PatientController extends Controller
             'has_rehab_clearance' => true,
             'is_first_visit' => false,
         ]);
+        app(AuditLogger::class)->log('patient.diagnosed', $patient);
 
         return response()->json([
             'message' => '診断済みに更新しました。',

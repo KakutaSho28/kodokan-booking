@@ -12,6 +12,8 @@ use App\Models\Patient;
 use App\Models\Staff;
 use App\Models\TreatmentType;
 use App\Models\Waitlist;
+use App\Services\AuditLogger;
+use App\Services\PatientDataMasker;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -36,7 +38,15 @@ class AppointmentController extends Controller
             $query->where('patient_id', $actor->id);
         }
 
-        return response()->json(['data' => $query->get()]);
+        $appointments = $query->get();
+
+        if (app(PatientDataMasker::class)->shouldMask($request)) {
+            return response()->json([
+                'data' => $appointments->map(fn (Appointment $appointment): array => $this->appointmentArray($request, $appointment))->all(),
+            ]);
+        }
+
+        return response()->json(['data' => $appointments]);
     }
 
     public function store(Request $request): JsonResponse
@@ -85,6 +95,7 @@ class AppointmentController extends Controller
         $appointment->staff_id ??= Staff::query()->orderBy('id')->value('id');
         $appointment->treatment_type_id ??= TreatmentType::query()->orderBy('id')->value('id');
         $appointment->save();
+        app(AuditLogger::class)->log('reservation.created', $appointment);
 
         SendPatientMailJob::dispatch(SendPatientMailJob::TYPE_RESERVATION_CONFIRMED, $appointment->id);
 
@@ -138,10 +149,11 @@ class AppointmentController extends Controller
 
         $appointment->updated_by_staff_id = $actor->id;
         $appointment->save();
+        app(AuditLogger::class)->log('reservation.updated', $appointment);
 
         return response()->json([
             'message' => '予約を更新しました。',
-            'data' => $appointment->load(['patient', 'slot.therapist', 'updatedByStaff']),
+            'data' => $this->appointmentArray($request, $appointment->load(['patient', 'slot.therapist', 'updatedByStaff'])),
         ]);
     }
 
@@ -157,6 +169,7 @@ class AppointmentController extends Controller
             'status' => Appointment::STATUS_CANCELLED,
             'updated_by_staff_id' => $actor->id,
         ]);
+        app(AuditLogger::class)->log('reservation.cancelled', $appointment);
 
         SendPatientMailJob::dispatch(SendPatientMailJob::TYPE_CANCELLATION, $appointment->id);
 
@@ -198,5 +211,19 @@ class AppointmentController extends Controller
         };
 
         return [$token->actor_type, $actor];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function appointmentArray(Request $request, Appointment $appointment): array
+    {
+        $data = $appointment->toArray();
+
+        if ($appointment->relationLoaded('patient') && $appointment->patient && app(PatientDataMasker::class)->shouldMask($request)) {
+            $data['patient'] = app(PatientDataMasker::class)->maskPatient($appointment->patient);
+        }
+
+        return $data;
     }
 }
