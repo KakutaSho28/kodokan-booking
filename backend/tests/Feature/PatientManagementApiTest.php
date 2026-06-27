@@ -112,8 +112,8 @@ class PatientManagementApiTest extends TestCase
 
         $this->withToken($token)
             ->postJson('/api/appointments', ['appointment_slot_id' => $slot->id])
-            ->assertUnprocessable()
-            ->assertJsonPath('message', '初診診断前のため、リハビリ予約はできません。');
+            ->assertForbidden()
+            ->assertJsonPath('message', '初診診断後にご予約いただけます');
     }
 
     public function test_patient_detail_contains_latest_reservations_and_assigned_therapist(): void

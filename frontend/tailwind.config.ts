@@ -11,7 +11,8 @@ export default <Partial<Config>>{
     extend: {
       colors: {
         primary: {
-          600: '#2563EB',
+          600: '#2C5F8A',
+          700: '#244F73',
         },
         surface: {
           50: '#F9FAFB',

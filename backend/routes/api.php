@@ -28,6 +28,8 @@ Route::middleware('throttle:60,1')->group(function (): void {
         Route::put('/patients/{patient}', [PatientController::class, 'update']);
         Route::put('/patients/{patient}/diagnose', [PatientController::class, 'diagnose']);
         Route::delete('/patients/{patient}', [PatientController::class, 'destroy']);
+        Route::get('/reservations/summary', [AppointmentController::class, 'summary']);
+        Route::get('/reservations/cancelled', [AppointmentController::class, 'cancelled']);
         Route::post('/staffs', [StaffController::class, 'store']);
         Route::put('/staffs/{staff}', [StaffController::class, 'update']);
         Route::put('/staffs/{staff}/deactivate', [StaffController::class, 'deactivate']);
@@ -50,6 +52,9 @@ Route::middleware('throttle:60,1')->group(function (): void {
     Route::middleware('role:patient')->prefix('portal')->group(function (): void {
         Route::get('/appointments', [AppointmentController::class, 'index']);
         Route::post('/appointments', [AppointmentController::class, 'store']);
+        Route::post('/reservations', [AppointmentController::class, 'store']);
+        Route::get('/my-reservations', [AppointmentController::class, 'myReservations']);
+        Route::delete('/reservations/{appointment}', [AppointmentController::class, 'destroyPortal']);
         Route::get('/waitlists', [WaitlistController::class, 'index']);
         Route::post('/waitlists', [WaitlistController::class, 'store']);
         Route::delete('/waitlists/{waitlist}', [WaitlistController::class, 'destroy']);
