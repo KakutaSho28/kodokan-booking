@@ -9,6 +9,7 @@ use App\Models\Appointment;
 use App\Models\AppointmentSlot;
 use App\Models\MailLog;
 use App\Models\Patient;
+use App\Models\Therapist;
 use App\Models\Waitlist;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,7 +64,13 @@ class MailNotificationTest extends TestCase
         $tomorrowSlot = AppointmentSlot::query()
             ->whereDate('date', CarbonImmutable::tomorrow()->toDateString())
             ->whereDoesntHave('appointments')
-            ->firstOrFail();
+            ->first() ?? AppointmentSlot::query()->create([
+                'therapist_id' => Therapist::query()->firstOrFail()->id,
+                'date' => CarbonImmutable::tomorrow()->toDateString(),
+                'starts_at' => '09:00:00',
+                'ends_at' => '09:30:00',
+                'capacity' => 1,
+            ]);
 
         $appointment = Appointment::query()->create([
             'patient_id' => Patient::query()->whereNotNull('email')->firstOrFail()->id,

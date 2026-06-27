@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\BuildsClinicMailHtml;
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -11,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ReservationConfirmedMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use BuildsClinicMailHtml, Queueable, SerializesModels;
 
     public function __construct(public Appointment $appointment) {}
 
@@ -31,8 +32,14 @@ class ReservationConfirmedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.reservation-confirmed',
-            with: ['appointment' => $this->appointment],
+            htmlString: $this->clinicLayout(
+                'リハビリ予約確定のお知らせ',
+                $this->heading('リハビリ予約を確定しました')
+                    .$this->paragraph($this->appointment->patient?->name.' 様')
+                    .$this->paragraph('以下の内容でリハビリ予約を受け付けました。')
+                    .$this->reservationDetail($this->appointment)
+                    .$this->paragraph('当日は診察券をお持ちのうえ、予約時間までに受付へお越しください。'),
+            ),
         );
     }
 }

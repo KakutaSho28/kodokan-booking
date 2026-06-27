@@ -1,0 +1,10 @@
+# GitHub Linguist language detection
+backend/vendor/** linguist-vendored
+frontend/node_modules/** linguist-vendored
+frontend/.nuxt/** linguist-generated
+
+*.php linguist-detectable=false
+*.blade.php linguist-detectable=false
+
+*.vue linguist-detectable=true
+*.ts linguist-detectable=true

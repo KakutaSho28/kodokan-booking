@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\BuildsClinicMailHtml;
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -11,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ReminderMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use BuildsClinicMailHtml, Queueable, SerializesModels;
 
     public function __construct(public Appointment $appointment) {}
 
@@ -31,8 +32,14 @@ class ReminderMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.reminder',
-            with: ['appointment' => $this->appointment],
+            htmlString: $this->clinicLayout(
+                '明日のリハビリ予約リマインダー',
+                $this->heading('明日のリハビリ予約のお知らせ')
+                    .$this->paragraph($this->appointment->patient?->name.' 様')
+                    .$this->paragraph('明日のリハビリ予約についてお知らせします。')
+                    .$this->reservationDetail($this->appointment)
+                    .$this->paragraph('変更やキャンセルが必要な場合は、クリニックまでご連絡ください。'),
+            ),
         );
     }
 }

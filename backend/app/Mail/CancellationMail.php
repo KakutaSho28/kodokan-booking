@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\BuildsClinicMailHtml;
 use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -11,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 class CancellationMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use BuildsClinicMailHtml, Queueable, SerializesModels;
 
     public function __construct(public Appointment $appointment) {}
 
@@ -31,8 +32,14 @@ class CancellationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.cancellation',
-            with: ['appointment' => $this->appointment],
+            htmlString: $this->clinicLayout(
+                'リハビリ予約キャンセルのお知らせ',
+                $this->heading('リハビリ予約をキャンセルしました')
+                    .$this->paragraph($this->appointment->patient?->name.' 様')
+                    .$this->paragraph('以下の予約のキャンセルが完了しました。')
+                    .$this->reservationDetail($this->appointment)
+                    .$this->paragraph('改めて予約を希望される場合は、予約画面から空き枠をご確認ください。'),
+            ),
         );
     }
 }
