@@ -141,13 +141,13 @@ defineExpose({
           selectedTime === slotTime(slot)
             ? 'border-[#2C5F8A] bg-[#2C5F8A] text-white'
             : slot.status === 'available'
-              ? 'border-[#2C5F8A] bg-white text-gray-900 hover:bg-blue-50'
+              ? 'border-2 border-[#2C5F8A] bg-white text-[#2C5F8A] hover:bg-[#F0F7FF]'
               : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400',
         ]"
       >
         <button
           v-if="slot.status === 'available'"
-          class="block w-full text-left"
+          class="block min-h-11 w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2"
           type="button"
           :disabled="readonly"
           @click="selectSlot(slot)"
@@ -162,13 +162,13 @@ defineExpose({
         </button>
 
         <div v-else class="space-y-2">
-          <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center justify-between gap-2 line-through">
             <span class="text-sm font-semibold">{{ slotTime(slot) }}</span>
             <span class="text-lg font-bold">×</span>
           </div>
           <button
             v-if="localWaitlist(slot)"
-            class="w-full rounded-lg border border-[#2C5F8A] bg-white px-3 py-2 text-xs font-semibold text-[#2C5F8A]"
+            class="min-h-11 w-full rounded-lg border border-[#2C5F8A] bg-white px-3 py-2 text-xs font-semibold text-[#2C5F8A]"
             type="button"
             disabled
           >
@@ -176,7 +176,7 @@ defineExpose({
           </button>
           <button
             v-else
-            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-[#2C5F8A] hover:text-[#2C5F8A] disabled:cursor-not-allowed disabled:opacity-50"
+            class="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-[#2C5F8A] hover:text-[#2C5F8A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             type="button"
             :disabled="!readonly && (!slotId(slot) || registeringSlotId === slotId(slot))"
             @click="joinWaitlist(slot)"

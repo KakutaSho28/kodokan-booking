@@ -58,7 +58,7 @@ class AppointmentController extends Controller
         }
 
         if (! $actor->canBookRehab()) {
-            return response()->json(['message' => '初診診断前のため、リハビリ予約はできません。'], 422);
+            return response()->json(['message' => '初診診断後にご予約いただけます'], 403);
         }
 
         $data = $request->validate([
@@ -86,12 +86,26 @@ class AppointmentController extends Controller
             return response()->json(['message' => 'この枠は満枠です。'], 422);
         }
 
+        $duplicate = Appointment::query()
+            ->where('patient_id', $actor->id)
+            ->where('status', Appointment::STATUS_BOOKED)
+            ->whereHas('slot', fn ($query) => $query
+                ->whereDate('date', $slot->date)
+                ->where('starts_at', $slot->starts_at)
+            )
+            ->exists();
+
+        if ($duplicate) {
+            return response()->json(['message' => '同じ日時の予約が既にあります。'], 422);
+        }
+
         $appointment = Appointment::query()->firstOrNew([
             'patient_id' => $actor->id,
             'appointment_slot_id' => $slot->id,
         ]);
 
         $appointment->status = Appointment::STATUS_BOOKED;
+        $appointment->cancelled_at = null;
         $appointment->staff_id ??= Staff::query()->orderBy('id')->value('id');
         $appointment->treatment_type_id ??= TreatmentType::query()->orderBy('id')->value('id');
         $appointment->save();
@@ -141,6 +155,7 @@ class AppointmentController extends Controller
 
         if (isset($data['status'])) {
             $appointment->status = $data['status'];
+            $appointment->cancelled_at = $data['status'] === Appointment::STATUS_CANCELLED ? now() : null;
         }
 
         if (array_key_exists('staff_notes', $data)) {
@@ -167,24 +182,111 @@ class AppointmentController extends Controller
 
         $appointment->update([
             'status' => Appointment::STATUS_CANCELLED,
+            'cancelled_at' => now(),
             'updated_by_staff_id' => $actor->id,
         ]);
         app(AuditLogger::class)->log('reservation.cancelled', $appointment);
 
         SendPatientMailJob::dispatch(SendPatientMailJob::TYPE_CANCELLATION, $appointment->id);
 
-        $waitlist = Waitlist::query()
-            ->where('slot_id', $appointment->appointment_slot_id)
-            ->where('status', Waitlist::STATUS_WAITING)
-            ->orderBy('priority')
-            ->first();
-
-        if ($waitlist) {
-            $waitlist->update(['status' => Waitlist::STATUS_PROMOTED]);
-            WaitlistPromotedJob::dispatch($waitlist->id);
-        }
+        $this->promoteWaitlist($appointment);
 
         return response()->json(['message' => '予約をキャンセルしました。']);
+    }
+
+    public function myReservations(Request $request): JsonResponse
+    {
+        [$role, $actor] = $this->actorFromRequest($request);
+
+        if ($role !== 'patient' || ! $actor instanceof Patient) {
+            return response()->json(['message' => '患者ログインが必要です。'], 403);
+        }
+
+        $appointments = Appointment::query()
+            ->with(['patient', 'slot.therapist', 'treatmentType'])
+            ->where('patient_id', $actor->id)
+            ->where('status', Appointment::STATUS_BOOKED)
+            ->whereHas('slot', fn ($query) => $query->whereDate('date', '>=', now()->toDateString()))
+            ->join('appointment_slots', 'appointments.appointment_slot_id', '=', 'appointment_slots.id')
+            ->select('appointments.*')
+            ->orderBy('appointment_slots.date')
+            ->orderBy('appointment_slots.starts_at')
+            ->get();
+
+        return response()->json(['data' => $appointments]);
+    }
+
+    public function destroyPortal(Request $request, Appointment $appointment): JsonResponse
+    {
+        [$role, $actor] = $this->actorFromRequest($request);
+
+        if ($role !== 'patient' || ! $actor instanceof Patient) {
+            return response()->json(['message' => '患者ログインが必要です。'], 403);
+        }
+
+        if ((int) $appointment->patient_id !== (int) $actor->id) {
+            return response()->json(['message' => '自分の予約のみキャンセルできます。'], 403);
+        }
+
+        $appointment->load('slot');
+        $reservedAt = $this->appointmentDateTime($appointment);
+
+        if (! $reservedAt || now()->addDay()->greaterThanOrEqualTo($reservedAt)) {
+            return response()->json(['message' => '予約日時の24時間前を過ぎたためキャンセルできません。'], 422);
+        }
+
+        $appointment->update([
+            'status' => Appointment::STATUS_CANCELLED,
+            'cancelled_at' => now(),
+        ]);
+        app(AuditLogger::class)->log('reservation.cancelled', $appointment);
+
+        SendPatientMailJob::dispatch(SendPatientMailJob::TYPE_CANCELLATION, $appointment->id);
+        $this->promoteWaitlist($appointment);
+
+        return response()->json(['message' => '予約をキャンセルしました。']);
+    }
+
+    public function summary(Request $request): JsonResponse
+    {
+        [$role, $actor] = $this->actorFromRequest($request);
+
+        if ($role !== 'staff' || ! $actor instanceof Staff || $actor->role !== 'admin') {
+            return response()->json(['message' => '管理者権限が必要です。'], 403);
+        }
+
+        return response()->json([
+            'today_count' => Appointment::query()
+                ->where('status', Appointment::STATUS_BOOKED)
+                ->whereHas('slot', fn ($query) => $query->whereDate('date', now()->toDateString()))
+                ->count(),
+            'upcoming_count' => Appointment::query()
+                ->where('status', Appointment::STATUS_BOOKED)
+                ->whereHas('slot', fn ($query) => $query->whereDate('date', '>=', now()->toDateString()))
+                ->count(),
+            'cancelled_count' => Appointment::query()
+                ->where('status', Appointment::STATUS_CANCELLED)
+                ->count(),
+        ]);
+    }
+
+    public function cancelled(Request $request): JsonResponse
+    {
+        [$role, $actor] = $this->actorFromRequest($request);
+
+        if ($role !== 'staff' || ! $actor instanceof Staff || $actor->role !== 'admin') {
+            return response()->json(['message' => '管理者権限が必要です。'], 403);
+        }
+
+        $appointments = Appointment::query()
+            ->with(['patient', 'slot.therapist'])
+            ->where('status', Appointment::STATUS_CANCELLED)
+            ->orderByDesc('cancelled_at')
+            ->latest()
+            ->limit(50)
+            ->get();
+
+        return response()->json(['data' => $appointments]);
     }
 
     /**
@@ -225,5 +327,28 @@ class AppointmentController extends Controller
         }
 
         return $data;
+    }
+
+    private function appointmentDateTime(Appointment $appointment): ?CarbonImmutable
+    {
+        if (! $appointment->slot) {
+            return null;
+        }
+
+        return CarbonImmutable::parse($appointment->slot->date->format('Y-m-d').' '.$appointment->slot->starts_at);
+    }
+
+    private function promoteWaitlist(Appointment $appointment): void
+    {
+        $waitlist = Waitlist::query()
+            ->where('slot_id', $appointment->appointment_slot_id)
+            ->where('status', Waitlist::STATUS_WAITING)
+            ->orderBy('priority')
+            ->first();
+
+        if ($waitlist) {
+            $waitlist->update(['status' => Waitlist::STATUS_PROMOTED]);
+            WaitlistPromotedJob::dispatch($waitlist->id);
+        }
     }
 }

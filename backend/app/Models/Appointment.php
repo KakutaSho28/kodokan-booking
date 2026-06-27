@@ -19,6 +19,11 @@ class Appointment extends Model
         'status',
         'staff_notes',
         'updated_by_staff_id',
+        'cancelled_at',
+    ];
+
+    protected $casts = [
+        'cancelled_at' => 'datetime',
     ];
 
     public function patient(): BelongsTo

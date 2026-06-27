@@ -87,4 +87,5 @@ export type Appointment = {
   slot: AppointmentSlot
   status: 'booked' | 'cancelled'
   staff_notes: string | null
+  cancelled_at?: string | null
 }
