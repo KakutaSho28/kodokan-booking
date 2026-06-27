@@ -183,7 +183,7 @@ onMounted(async () => {
         <h1 class="mt-2 text-2xl font-bold text-gray-900">シフト管理</h1>
         <p class="mt-1 text-sm text-gray-500">{{ targetStaff?.name || `スタッフID: ${staffId}` }}</p>
       </div>
-      <input v-model="selectedMonth" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100" type="month">
+      <input v-model="selectedMonth" class="min-h-11 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100" type="month">
     </header>
 
     <section v-if="!token" class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
@@ -199,7 +199,7 @@ onMounted(async () => {
             <input id="staff-password" v-model="loginForm.password" :class="controlClass" type="password">
           </div>
         </UiFormGrid>
-        <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="loading">
+        <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="loading">
           ログイン
         </button>
       </form>
@@ -216,16 +216,13 @@ onMounted(async () => {
         <div class="py-2">土</div>
       </div>
 
-      <div v-if="loading" class="flex items-center gap-2 p-5 text-sm font-medium text-primary-600">
-        <span class="size-4 animate-spin rounded-full border-2 border-blue-100 border-t-primary-600" />
-        読み込み中
-      </div>
+      <UiSkeletonBlock v-if="loading" class="p-5" :rows="6" />
 
       <div v-else class="grid grid-cols-7">
         <button
           v-for="day in calendarDays"
           :key="day.date"
-          class="min-h-28 border-b border-r border-gray-100 p-2 text-left transition"
+          class="min-h-28 border-b border-r border-gray-100 p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2"
           :class="day.isBlank ? 'cursor-default bg-gray-50' : 'bg-white hover:bg-blue-50'"
           type="button"
           :disabled="day.isBlank"
@@ -254,10 +251,10 @@ onMounted(async () => {
           <h2 class="text-lg font-bold text-gray-900">{{ shiftForm.work_date }} のシフト</h2>
           <form class="mt-5 space-y-4" @submit.prevent="saveShift">
             <div class="grid grid-cols-2 gap-2 rounded-lg bg-gray-100 p-1">
-              <button class="rounded-md px-3 py-2 text-sm font-semibold" :class="!shiftForm.is_day_off ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600'" type="button" @click="shiftForm.is_day_off = false">
+              <button class="min-h-11 rounded-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :class="!shiftForm.is_day_off ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600'" type="button" @click="shiftForm.is_day_off = false">
                 出勤
               </button>
-              <button class="rounded-md px-3 py-2 text-sm font-semibold" :class="shiftForm.is_day_off ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600'" type="button" @click="shiftForm.is_day_off = true">
+              <button class="min-h-11 rounded-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :class="shiftForm.is_day_off ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-600'" type="button" @click="shiftForm.is_day_off = true">
                 休日
               </button>
             </div>
@@ -274,10 +271,10 @@ onMounted(async () => {
             </UiFormGrid>
 
             <div class="flex justify-end gap-3">
-              <button class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" type="button" @click="showShiftModal = false">
+              <button class="min-h-11 rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" type="button" @click="showShiftModal = false">
                 キャンセル
               </button>
-              <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="saving">
+              <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="saving">
                 保存
               </button>
             </div>

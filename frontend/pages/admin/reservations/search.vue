@@ -169,7 +169,7 @@ function goToPage(nextPage: number) {
 
         <div class="flex justify-end">
           <button
-            class="inline-flex min-h-10 items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             type="submit"
             :disabled="pending"
           >
@@ -182,21 +182,19 @@ function goToPage(nextPage: number) {
     <section class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm text-gray-600">検索結果: {{ meta.total }}件</p>
-        <div v-if="pending" class="flex items-center gap-2 text-sm font-medium text-primary-600">
-          <span class="size-4 animate-spin rounded-full border-2 border-blue-200 border-t-primary-600" />
-          読み込み中
-        </div>
       </div>
 
       <p v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
         検索に失敗しました。
       </p>
 
+      <UiSkeletonBlock v-if="pending" :rows="6" />
+      <UiEmptyState v-else-if="rows.length === 0" />
       <UiResponsiveTable v-else :columns="columns" :rows="rows" />
 
       <div class="flex items-center justify-between gap-3">
         <button
-          class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="page <= 1 || pending"
           @click="goToPage(page - 1)"
@@ -205,7 +203,7 @@ function goToPage(nextPage: number) {
         </button>
         <span class="text-sm text-gray-600">{{ page }} / {{ meta.last_page }} ページ</span>
         <button
-          class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="page >= meta.last_page || pending"
           @click="goToPage(page + 1)"

@@ -169,7 +169,7 @@ onMounted(async () => {
       </div>
       <button
         v-if="token"
-        class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         type="button"
         :disabled="!isAdmin"
         @click="openCreateModal"
@@ -191,17 +191,20 @@ onMounted(async () => {
             <input id="staff-password" v-model="loginForm.password" :class="controlClass" type="password">
           </div>
         </UiFormGrid>
-        <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="loading">
+        <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="loading">
           ログイン
         </button>
       </form>
     </section>
 
     <section v-else class="rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div v-if="loading" class="flex items-center gap-2 p-5 text-sm font-medium text-primary-600">
-        <span class="size-4 animate-spin rounded-full border-2 border-blue-100 border-t-primary-600" />
-        読み込み中
-      </div>
+      <UiSkeletonBlock v-if="loading" class="p-5" :rows="5" />
+
+      <UiEmptyState v-else-if="staffs.length === 0" class="m-5">
+        <button v-if="isAdmin" class="min-h-11 rounded-lg bg-[#2C5F8A] px-4 py-2 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" type="button" @click="openCreateModal">
+          新規スタッフ追加
+        </button>
+      </UiEmptyState>
 
       <div v-else class="overflow-hidden">
         <table class="hidden min-w-full divide-y divide-gray-200 lg:table">
@@ -227,13 +230,13 @@ onMounted(async () => {
               </td>
               <td class="px-4 py-3">
                 <div class="flex justify-end gap-2">
-                  <NuxtLink class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" :to="`/admin/staffs/${staff.id}/shifts`">
+                  <NuxtLink class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :to="`/admin/staffs/${staff.id}/shifts`">
                     シフト
                   </NuxtLink>
-                  <button class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50" type="button" :disabled="!isAdmin" @click="openEditModal(staff)">
+                  <button class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="button" :disabled="!isAdmin" @click="openEditModal(staff)">
                     編集
                   </button>
-                  <button class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50" type="button" :disabled="!isAdmin || !staff.is_active" @click="deactivateStaff(staff)">
+                  <button class="min-h-11 rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="button" :disabled="!isAdmin || !staff.is_active" @click="deactivateStaff(staff)">
                     無効化
                   </button>
                 </div>
@@ -254,10 +257,10 @@ onMounted(async () => {
               </span>
             </div>
             <div class="mt-4 flex flex-wrap justify-end gap-2">
-              <NuxtLink class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700" :to="`/admin/staffs/${staff.id}/shifts`">
+              <NuxtLink class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :to="`/admin/staffs/${staff.id}/shifts`">
                 シフト
               </NuxtLink>
-              <button class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 disabled:opacity-50" type="button" :disabled="!isAdmin" @click="openEditModal(staff)">
+              <button class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="button" :disabled="!isAdmin" @click="openEditModal(staff)">
                 編集
               </button>
             </div>
@@ -299,10 +302,10 @@ onMounted(async () => {
             </label>
 
             <div class="flex justify-end gap-3">
-              <button class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" type="button" @click="showStaffModal = false">
+              <button class="min-h-11 rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" type="button" @click="showStaffModal = false">
                 キャンセル
               </button>
-              <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="saving">
+              <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="saving">
                 保存
               </button>
             </div>

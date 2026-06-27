@@ -204,24 +204,21 @@ onMounted(async () => {
             <input id="staff-password" v-model="loginForm.password" :class="controlClass" type="password">
           </div>
         </UiFormGrid>
-        <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="loading">
+        <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="loading">
           ログイン
         </button>
       </form>
     </section>
 
     <template v-else>
-      <div v-if="loading" class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-5 text-sm font-medium text-primary-600">
-        <span class="size-4 animate-spin rounded-full border-2 border-blue-100 border-t-primary-600" />
-        読み込み中
-      </div>
+      <UiSkeletonBlock v-if="loading" :rows="6" />
 
       <template v-else-if="patient">
         <section v-if="!patient.is_diagnosed" class="rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <p class="font-semibold">この患者はまだ初診診断が完了していません。診断後に「診断済みにする」ボタンを押してください。</p>
             <button
-              class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+              class="min-h-11 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               type="button"
               :disabled="!isAdmin || saving"
               @click="showDiagnoseConfirm = true"
@@ -272,7 +269,7 @@ onMounted(async () => {
             </UiFormGrid>
 
             <div class="flex justify-end">
-              <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50" type="submit" :disabled="!isAdmin || saving">
+              <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" type="submit" :disabled="!isAdmin || saving">
                 保存
               </button>
             </div>
@@ -282,14 +279,12 @@ onMounted(async () => {
         <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-bold text-gray-900">過去予約</h2>
-            <button class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" type="button" @click="fetchReservations">
+            <button class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" type="button" @click="fetchReservations">
               更新
             </button>
           </div>
 
-          <div v-if="reservations.length === 0" class="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-            予約履歴はありません。
-          </div>
+          <UiEmptyState v-if="reservations.length === 0" class="mt-5" message="予約履歴はありません" />
 
           <div v-else class="mt-5 overflow-hidden rounded-lg border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">

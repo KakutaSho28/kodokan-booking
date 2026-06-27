@@ -118,7 +118,7 @@ onMounted(async () => {
             <input id="staff-password" v-model="loginForm.password" :class="controlClass" type="password">
           </div>
         </UiFormGrid>
-        <button class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="loading">
+        <button class="min-h-11 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="loading">
           ログイン
         </button>
       </form>
@@ -129,18 +129,18 @@ onMounted(async () => {
         <form class="grid gap-4 lg:grid-cols-[1fr_14rem_auto]" @submit.prevent="fetchPatients">
           <div>
             <label class="text-sm font-semibold text-gray-700" for="patient-name">氏名検索</label>
-            <input id="patient-name" v-model="filters.name" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100" type="search" placeholder="患者名">
+            <input id="patient-name" v-model="filters.name" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100" type="search" placeholder="患者名">
           </div>
           <div>
             <label class="text-sm font-semibold text-gray-700" for="diagnosis-status">診断ステータス</label>
-            <select id="diagnosis-status" v-model="filters.is_diagnosed" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <select id="diagnosis-status" v-model="filters.is_diagnosed" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
               <option value="">すべて</option>
               <option value="1">診断済み</option>
               <option value="0">未診断</option>
             </select>
           </div>
           <div class="flex items-end">
-            <button class="w-full rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" type="submit" :disabled="loading">
+            <button class="min-h-11 w-full rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2 disabled:opacity-50" type="submit" :disabled="loading">
               検索
             </button>
           </div>
@@ -148,10 +148,9 @@ onMounted(async () => {
       </section>
 
       <section class="rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div v-if="loading" class="flex items-center gap-2 p-5 text-sm font-medium text-primary-600">
-          <span class="size-4 animate-spin rounded-full border-2 border-blue-100 border-t-primary-600" />
-          読み込み中
-        </div>
+        <UiSkeletonBlock v-if="loading" class="p-5" :rows="5" />
+
+        <UiEmptyState v-else-if="patients.length === 0" class="m-5" />
 
         <div v-else class="overflow-hidden">
           <table class="hidden min-w-full divide-y divide-gray-200 lg:table">
@@ -177,7 +176,7 @@ onMounted(async () => {
                 <td class="px-4 py-3 text-sm text-gray-700">{{ patient.assigned_therapist?.name || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ formatDate(patient.created_at) }}</td>
                 <td class="px-4 py-3 text-right">
-                  <NuxtLink class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" :to="`/admin/patients/${patient.id}`">
+                  <NuxtLink class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :to="`/admin/patients/${patient.id}`">
                     詳細
                   </NuxtLink>
                 </td>
@@ -207,7 +206,7 @@ onMounted(async () => {
                 </div>
               </dl>
               <div class="mt-4 flex justify-end">
-                <NuxtLink class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700" :to="`/admin/patients/${patient.id}`">
+                <NuxtLink class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" :to="`/admin/patients/${patient.id}`">
                   詳細
                 </NuxtLink>
               </div>
