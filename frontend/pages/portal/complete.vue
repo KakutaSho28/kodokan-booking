@@ -1,46 +1,68 @@
 <script setup lang="ts">
-import type { Appointment } from '~/types/booking'
+import type { Appointment } from "~/types/booking";
 
 definePageMeta({
-  layout: 'portal',
-})
+  layout: "portal",
+});
 
-const appointment = ref<Appointment | null>(null)
+const appointment = ref<Appointment | null>(null);
 
 function slotTime(appointmentValue: Appointment) {
-  return appointmentValue.slot?.time || appointmentValue.slot?.starts_at?.slice(0, 5) || ''
+  return (
+    appointmentValue.slot?.time ||
+    appointmentValue.slot?.starts_at?.slice(0, 5) ||
+    ""
+  );
 }
 
 onMounted(() => {
-  const saved = localStorage.getItem('portal_last_appointment')
-  appointment.value = saved ? JSON.parse(saved) : null
-})
+  const saved = localStorage.getItem("portal_last_appointment");
+  appointment.value = saved ? JSON.parse(saved) : null;
+});
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl space-y-6">
-    <section class="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
-      <div class="mx-auto grid size-16 place-items-center rounded-full border-2 border-[#2C5F8A]">
-        <span class="block size-8 rotate-45 border-b-4 border-r-4 border-[#2C5F8A] animate-[check_420ms_ease-out_forwards]" />
+  <div class="mx-auto max-w-md pt-16">
+    <section class="text-center">
+      <div
+        class="mx-auto grid size-20 place-items-center rounded-full bg-[#27AE60] animate-[checkCircle_400ms_ease-out_forwards]"
+      >
+        <span
+          class="block size-9 rotate-45 border-b-4 border-r-4 border-white"
+        />
       </div>
-      <h1 class="mt-5 text-2xl font-bold text-gray-900">ご予約が完了しました</h1>
+      <h1 class="mt-6 text-2xl font-bold text-gray-900">
+        ご予約が完了しました
+      </h1>
 
-      <dl v-if="appointment" class="mt-6 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-left text-sm">
-        <div class="flex justify-between gap-4">
+      <dl
+        v-if="appointment"
+        class="mt-6 grid gap-4 rounded-lg border border-gray-100 bg-white p-6 text-left text-sm shadow-sm"
+      >
+        <div>
           <dt class="text-gray-500">担当者</dt>
-          <dd class="font-bold text-gray-900">{{ appointment.slot?.therapist?.name || '-' }}</dd>
+          <dd class="mt-1 font-medium text-gray-900">
+            {{ appointment.slot?.therapist?.name || "-" }}
+          </dd>
         </div>
-        <div class="flex justify-between gap-4">
+        <div>
           <dt class="text-gray-500">日付</dt>
-          <dd class="font-bold text-gray-900">{{ appointment.slot?.date }}</dd>
+          <dd class="mt-1 font-medium text-gray-900">
+            {{ appointment.slot?.date }}
+          </dd>
         </div>
-        <div class="flex justify-between gap-4">
+        <div>
           <dt class="text-gray-500">時間</dt>
-          <dd class="font-bold text-gray-900">{{ slotTime(appointment) }}</dd>
+          <dd class="mt-1 font-medium text-gray-900">
+            {{ slotTime(appointment) }}
+          </dd>
         </div>
       </dl>
 
-      <NuxtLink class="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-[#2C5F8A] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#244f73] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2" to="/portal/mypage">
+      <NuxtLink
+        class="mt-6 inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-[#2C5F8A] px-5 text-sm font-semibold text-white transition-all duration-150 ease-in-out hover:bg-[#4A90B8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2C5F8A]"
+        to="/portal/mypage"
+      >
         マイページへ
       </NuxtLink>
     </section>
@@ -48,14 +70,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@keyframes check {
+@keyframes checkCircle {
   from {
     opacity: 0;
-    transform: rotate(45deg) scale(0.6);
+    transform: scale(0);
   }
   to {
     opacity: 1;
-    transform: rotate(45deg) scale(1);
+    transform: scale(1);
   }
 }
 </style>
