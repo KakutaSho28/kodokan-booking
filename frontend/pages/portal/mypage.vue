@@ -287,6 +287,10 @@ onMounted(async () => {
               >
                 キャンセル
               </button>
+              <p v-else class="mt-1 text-xs text-gray-400 sm:max-w-64">
+                ※
+                前日までキャンセル可能です。ご変更はお電話にてご連絡ください。03-5842-6311
+              </p>
             </div>
           </article>
         </div>
