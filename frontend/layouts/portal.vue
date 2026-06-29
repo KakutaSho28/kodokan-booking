@@ -72,10 +72,21 @@ onMounted(() => {
 
     <footer class="border-t border-gray-200 bg-white">
       <div
-        class="mx-auto max-w-5xl px-4 py-5 text-xs leading-6 text-gray-500 md:px-6"
+        class="mx-auto max-w-5xl space-y-2 px-4 py-5 text-xs leading-6 text-gray-500 md:px-6"
       >
-        講道館ビルクリニック｜〒112-0003 東京都文京区春日1-16-30｜TEL:
-        03-5842-6311
+        <p>
+          講道館ビルクリニック｜〒112-0003 東京都文京区春日1-16-30｜TEL:
+          03-5842-6311
+        </p>
+        <nav class="flex gap-3 text-gray-400">
+          <NuxtLink class="underline hover:text-gray-600" to="/terms">
+            利用規約
+          </NuxtLink>
+          <span>|</span>
+          <NuxtLink class="underline hover:text-gray-600" to="/privacy">
+            プライバシーポリシー
+          </NuxtLink>
+        </nav>
       </div>
     </footer>
   </div>
