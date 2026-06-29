@@ -251,6 +251,28 @@ watch(
         </button>
       </form>
 
+      <p class="mt-3 text-center text-xs text-gray-400">
+        ログインすることで
+        <NuxtLink
+          class="text-[#2C5F8A] underline hover:text-[#4A90B8]"
+          rel="noopener noreferrer"
+          target="_blank"
+          to="/terms"
+        >
+          利用規約
+        </NuxtLink>
+        と
+        <NuxtLink
+          class="text-[#2C5F8A] underline hover:text-[#4A90B8]"
+          rel="noopener noreferrer"
+          target="_blank"
+          to="/privacy"
+        >
+          プライバシーポリシー
+        </NuxtLink>
+        に同意したものとみなします
+      </p>
+
       <p class="mt-4 text-sm leading-6 text-gray-500">
         診察券番号・生年月日でログインできます。ご不明な場合は受付
         (03-5842-6311) にお問い合わせください。
