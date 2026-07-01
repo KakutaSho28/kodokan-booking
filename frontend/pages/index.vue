@@ -63,7 +63,7 @@ const currentUserName = computed(() => user.value?.name || '')
 const appointmentRows = computed<AppointmentTableRow[]>(() => appointments.value.map((appointment) => ({
   patientName: appointment.patient.name,
   cardNumber: appointment.patient.card_number,
-  therapistName: appointment.slot.therapist.name,
+  therapistName: therapistName(appointment.slot),
   schedule: `${formatDate(appointment.slot.date)} ${formatTime(appointment.slot.starts_at)} - ${formatTime(appointment.slot.ends_at)}`,
   statusLabel: appointment.status === 'booked' ? '予約中' : 'キャンセル',
   staffNotes: appointment.staff_notes || '-',
@@ -77,7 +77,7 @@ const confirmModal = computed(() => {
     const slot = pendingAction.value.slot
     return {
       title: '予約登録の確認',
-      message: `${formatDate(slot.date)} ${formatTime(slot.starts_at)}から、${slot.therapist.name}で予約します。`,
+      message: `${formatDate(slot.date)} ${formatTime(slot.starts_at)}から、${therapistName(slot)}で予約します。`,
       confirmLabel: '予約する',
       isDestructive: false,
     }
@@ -113,6 +113,18 @@ function apiError(err: unknown) {
 
 function appointmentFromRow(row: Record<string, unknown>) {
   return row.appointment as Appointment
+}
+
+function slotKey(slot: AppointmentSlot) {
+  return slot.id ?? `${slot.therapist_id}-${slot.date}-${slot.starts_at}`
+}
+
+function therapistName(slot: AppointmentSlot) {
+  return slot.therapist?.name || '担当者未設定'
+}
+
+function therapistSpecialty(slot: AppointmentSlot) {
+  return slot.therapist?.specialty || '専門未設定'
 }
 
 function updateRowSlot(row: Record<string, unknown>, event: Event) {
@@ -435,18 +447,18 @@ watch([selectedDate, selectedTherapistId], () => {
             <div class="slot-grid">
               <button
                 v-for="slot in slots"
-                :key="slot.id"
+                :key="slotKey(slot)"
                 class="card slot"
                 type="button"
                 :disabled="!isPatient || !canBookRehab || !slot.is_available || loading"
                 @click="requestBook(slot)"
               >
                 <div class="slot-header">
-                  <strong>{{ slot.therapist.name }}</strong>
+                  <strong>{{ therapistName(slot) }}</strong>
                   <span class="mark" :class="slot.is_available ? 'ok' : 'full'">{{ slot.availability_mark }}</span>
                 </div>
                 <div class="slot-time">{{ formatTime(slot.starts_at) }} - {{ formatTime(slot.ends_at) }}</div>
-                <p>{{ formatDate(slot.date) }} / {{ slot.therapist.specialty }}</p>
+                <p>{{ formatDate(slot.date) }} / {{ therapistSpecialty(slot) }}</p>
                 <p>予約 {{ slot.booked_count }} / {{ slot.capacity }}</p>
               </button>
             </div>
@@ -464,16 +476,16 @@ watch([selectedDate, selectedTherapistId], () => {
                     <label :class="labelClass">枠変更</label>
                     <select
                       :class="controlClass"
-                      :value="appointmentFromRow(row).slot.id"
+                      :value="appointmentFromRow(row).slot.id ?? ''"
                       @change="updateRowSlot(row, $event)"
                     >
                       <option
                         v-for="slot in slots"
-                        :key="slot.id"
-                        :value="slot.id"
+                        :key="slotKey(slot)"
+                        :value="slot.id ?? ''"
                         :disabled="!slot.is_available && slot.id !== appointmentFromRow(row).slot.id"
                       >
-                        {{ slot.therapist.name }} {{ formatTime(slot.starts_at) }} {{ slot.availability_mark }}
+                        {{ therapistName(slot) }} {{ formatTime(slot.starts_at) }} {{ slot.availability_mark }}
                       </option>
                     </select>
                   </div>
@@ -524,7 +536,7 @@ watch([selectedDate, selectedTherapistId], () => {
             <div v-else class="appointment-list">
               <article v-for="appointment in appointments" :key="appointment.id" class="card appointment">
                 <div>
-                  <h3>{{ appointment.patient.name }} / {{ appointment.slot.therapist.name }}</h3>
+                  <h3>{{ appointment.patient.name }} / {{ therapistName(appointment.slot) }}</h3>
                   <p>{{ formatDate(appointment.slot.date) }} {{ formatTime(appointment.slot.starts_at) }} - {{ formatTime(appointment.slot.ends_at) }}</p>
                   <p>診察券番号: {{ appointment.patient.card_number }}</p>
                   <p v-if="appointment.staff_notes">メモ: {{ appointment.staff_notes }}</p>
