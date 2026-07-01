@@ -20,6 +20,10 @@ export function useAuth() {
     user.value = savedUser ? JSON.parse(savedUser) : null;
   }
 
+  if (import.meta.client) {
+    loadSession();
+  }
+
   function setSession(
     nextToken: string,
     nextUserType: UserType,

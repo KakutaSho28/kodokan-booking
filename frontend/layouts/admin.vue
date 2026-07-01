@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const route = useRoute()
 const config = useRuntimeConfig()
-const adminToken = ref('')
+const adminToken = ref(
+  import.meta.client ? localStorage.getItem('admin_token') || '' : ''
+)
 const adminStaffName = ref('')
 
 const navigationItems = [
