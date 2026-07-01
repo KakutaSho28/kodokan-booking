@@ -53,16 +53,19 @@ onMounted(() => {
           講道館ビルクリニック
         </NuxtLink>
 
-        <div v-if="user" class="flex items-center gap-3">
+        <div v-if="token" class="flex items-center gap-3">
           <div
             class="grid size-11 place-items-center rounded-full text-sm font-bold text-white"
             :class="avatarClass"
           >
             {{ initials }}
           </div>
-          <span class="hidden text-sm font-semibold text-gray-700 sm:inline">{{
-            user.name
-          }}</span>
+          <span
+            v-if="user"
+            class="hidden text-sm font-semibold text-gray-700 sm:inline"
+          >
+            {{ user.name }}
+          </span>
           <button
             class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-[#666666] transition-all duration-150 ease-in-out hover:bg-[#F5F7FA] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2C5F8A]"
             type="button"
