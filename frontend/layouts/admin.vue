@@ -35,6 +35,17 @@ function syncAdminSession() {
   }
 }
 
+const showLogoutConfirm = ref(false)
+
+function requestLogout() {
+  showLogoutConfirm.value = true
+}
+
+async function confirmLogout() {
+  showLogoutConfirm.value = false
+  await logoutAdmin()
+}
+
 async function logoutAdmin() {
   const currentToken = adminToken.value
 
@@ -96,33 +107,20 @@ onBeforeUnmount(() => {
           <span>{{ item.label }}</span>
         </NuxtLink>
       </nav>
-
-      <div v-if="adminToken" class="mt-auto border-t border-gray-200 p-3">
-        <p class="truncate px-2 text-xs font-semibold text-gray-500">
-          {{ adminStaffName || 'スタッフ' }}
-        </p>
-        <button
-          class="mt-2 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2"
-          type="button"
-          @click="logoutAdmin"
-        >
-          ログアウト
-        </button>
-      </div>
     </aside>
 
     <main class="min-h-screen px-4 pb-24 pt-4 md:px-6 md:pt-6 lg:ml-60 lg:px-8 lg:pb-8">
       <div
         v-if="adminToken"
-        class="mb-4 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm lg:hidden"
+        class="sticky top-0 z-20 mb-4 flex items-center justify-end gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm"
       >
         <p class="truncate text-sm font-semibold text-gray-700">
           {{ adminStaffName || 'スタッフ' }}
         </p>
         <button
-          class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2"
+          class="min-h-11 shrink-0 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F8A] focus-visible:ring-offset-2"
           type="button"
-          @click="logoutAdmin"
+          @click="requestLogout"
         >
           ログアウト
         </button>
@@ -144,5 +142,15 @@ onBeforeUnmount(() => {
         </NuxtLink>
       </div>
     </nav>
+
+    <UiConfirmModal
+      v-if="showLogoutConfirm"
+      title="ログアウト"
+      message="ログアウトしますか?"
+      confirm-label="ログアウト"
+      :is-destructive="true"
+      @cancel="showLogoutConfirm = false"
+      @confirm="confirmLogout"
+    />
   </div>
 </template>

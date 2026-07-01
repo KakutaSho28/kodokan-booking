@@ -11,7 +11,15 @@ const initials = computed(() => {
   return name.slice(0, 1);
 });
 
-async function logout() {
+const showLogoutConfirm = ref(false);
+
+function requestLogout() {
+  showLogoutConfirm.value = true;
+}
+
+async function confirmLogout() {
+  showLogoutConfirm.value = false;
+
   if (token.value) {
     try {
       await $fetch(`${config.public.apiBase}/logout`, {
@@ -58,7 +66,7 @@ onMounted(() => {
           <button
             class="min-h-11 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-[#666666] transition-all duration-150 ease-in-out hover:bg-[#F5F7FA] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2C5F8A]"
             type="button"
-            @click="logout"
+            @click="requestLogout"
           >
             ログアウト
           </button>
@@ -69,6 +77,16 @@ onMounted(() => {
     <main class="mx-auto max-w-5xl px-4 py-6 md:px-6 lg:py-8">
       <slot />
     </main>
+
+    <UiConfirmModal
+      v-if="showLogoutConfirm"
+      title="ログアウト"
+      message="ログアウトしますか?"
+      confirm-label="ログアウト"
+      :is-destructive="true"
+      @cancel="showLogoutConfirm = false"
+      @confirm="confirmLogout"
+    />
 
     <footer class="border-t border-gray-200 bg-white">
       <div
